@@ -21,52 +21,78 @@ from src.utils import load_net
 from src.parsers import parser_plot_weatherbench, setup
 from src.weatherbench_utils import load_weatherbench_data, convert_tensor_to_da, plot_map_ax
 
-parser = parser_plot_weatherbench()
-args = parser.parse_args()
+model = 'WeatherBench'
+method = 'SR'
+scoring_rule = 'SignatureKernel'
+kernel = 'RBFtest'  ##??
+patched = False
+base_measure = 'normal'
+root_folder = 'results'         # Where results are stored
+model_folder = 'nets'           # Subfolder for models
+datasets_folder = 'results/lorenz96/datasets/'
+nets_folder = 'results/nets/'
+weatherbench_data_folder = "../geopotential_500_5.625deg"
+weatherbench_small = False
 
-method = args.method
-scoring_rule = args.scoring_rule
-kernel = args.kernel
-patched = args.patched
-base_measure = args.base_measure
-root_folder = args.root_folder
-model_folder = args.model_folder
-datasets_folder = args.datasets_folder
-weatherbench_data_folder = args.weatherbench_data_folder
-weatherbench_small = args.weatherbench_small
-unet_noise_method = args.unet_noise_method
-unet_large = args.unet_large
-lr = args.lr
-lr_c = args.lr_c
-batch_size = args.batch_size
-no_early_stop = args.no_early_stop
-critic_steps_every_generator_step = args.critic_steps_every_generator_step
-save_plots = not args.no_save_plots
-cuda = args.cuda
-load_all_data_GPU = args.load_all_data_GPU
-training_ensemble_size = args.training_ensemble_size
-prediction_ensemble_size = args.prediction_ensemble_size
-nonlinearity = args.nonlinearity
-data_size = args.data_size
-auxiliary_var_size = args.auxiliary_var_size
-seed = args.seed
-patch_size = args.patch_size
-date = args.date
+#name_postfix = '_mytrainedmodelEnergyScore' ##Change this
+name_postfix = '_mytrainedmodelSignatureKernel' ##Change this
+training_ensemble_size = 3  #3/10
+prediction_ensemble_size = 3 ##3/10
+prediction_length = 2  
+ensemble_size = prediction_ensemble_size
+unet_noise_method = 'sum'  # or 'concat', etc., if relevant
+unet_large = True
+
+lr = 0.1
+lr_c = 0.0
+batch_size = 1
+no_early_stop = True
+critic_steps_every_generator_step = 1
+
+save_plots = True
+nonlinearity = 'leaky_relu'
+data_size = torch.Size([10, 32, 64])              # For Lorenz63, typically data_size=1 or 3
+auxiliary_var_size = 1
+seed = 0
+
+plot_start_timestep = 0
+plot_end_timestep = 100
+
+gamma = None
+gamma_patched = None
+patch_size = 16
+no_RNN = False
+hidden_size_rnn = 32
+
+save_pdf = True
+
+save_pdf = True
+
+compute_patched = model in ["lorenz96", ]
+
+model_is_weatherbench = model == "WeatherBench"
+
+nn_model = "unet" if model_is_weatherbench else ("fcnn" if no_RNN else "rnn")
+
+method_is_gan = False
 
 save_pdf = True
 
 # notice this assumes the WeatherBench dataset is considered in the daily setup.
+unet_depths = (32, 64, 128, 256)
 
-datasets_folder, nets_folder, data_size, auxiliary_var_size, name_postfix, unet_depths, patch_size, method_is_gan, hidden_size_rnn = \
-    setup("WeatherBench", root_folder, model_folder, datasets_folder, data_size, method, scoring_rule, kernel, patched,
-          patch_size, training_ensemble_size, auxiliary_var_size, critic_steps_every_generator_step, base_measure, lr,
-          lr_c, batch_size, no_early_stop, unet_noise_method, unet_large, "unet", None)
+# datasets_folder, nets_folder, data_size, auxiliary_var_size, name_postfix, unet_depths, patch_size, method_is_gan, hidden_size_rnn = \
+#     setup("WeatherBench", root_folder, model_folder, datasets_folder, data_size, method, scoring_rule, kernel, patched,
+#           patch_size, training_ensemble_size, auxiliary_var_size, critic_steps_every_generator_step, base_measure, lr,
+#           lr_c, batch_size, no_early_stop, unet_noise_method, unet_large, "unet", None)
 
 string = f"Plot WeatherBench results with {method}"
 if not method_is_gan and not method == "regression":
     string += f" using {scoring_rule} scoring rule"
 print(string)
 
+cuda = True
+load_all_data_GPU = True
 dataset_train, dataset_val, dataset_test = load_weatherbench_data(weatherbench_data_folder, cuda, load_all_data_GPU,
                                                                   return_test=True,
                                                                   weatherbench_small=weatherbench_small)
@@ -102,12 +128,17 @@ else:  # SR and GAN
 if cuda:
     net.cuda()
 
+date = "2018-05-16"
 # predict for a given date and create the plot
 with torch.no_grad():
     # obtain the target and context for the specified timestring
     timestring = date + "T12:00:00.000000000"
     context, realization = dataset_test.select_time(timestring)
+    print(context.shape)
+    print(realization.shape)
+    
 
+    print(breakd)
     # predict the realization with the context:
     prediction = net(context.unsqueeze(1)).cpu()  # should specify how many we want
 

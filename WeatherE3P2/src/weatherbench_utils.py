@@ -135,6 +135,20 @@ class WeatherBenchDataset(Dataset):
             context = torch.from_numpy(context.astype("float32"))
         return context, target
 
+    def select_time_window(self, timestring):
+        """Returns the context and target at a given timestring. The context is returned as torch (to be input in a
+        net), while the target is returned as a xarray.DataArray"""
+        where_result = np.where(self.data.time == np.datetime64(timestring))
+        print("corresponding index", where_result)
+        if len(where_result[0]) == 0:
+            raise RuntimeError("No data corresponding to that timestring.")
+        where_result = where_result[0][0]
+        context = self.data_torch[where_result -self.observation_window: where_result]
+        target = self.data_torch[
+                where_result: where_result + self.prediction_length
+            ]
+        return context, target
+    
 
 def load_weatherbench_data(weatherbench_data_folder, cuda, load_all_data_GPU, return_test=False,
                            weatherbench_small=False, predictionlength = 2):
