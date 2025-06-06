@@ -36,7 +36,7 @@ weatherbench_small = False
 name_postfix = '_mytrainedmodelEnergyScore' ##Change this
 #name_postfix = '_mytrainedmodelSignatureKernel' ##Change this
 training_ensemble_size = 3  #3/10
-prediction_ensemble_size = 3 ##3/10
+prediction_ensemble_size = 10 ##3/10
 prediction_length = 10  
 
 weights = np.array([0.07704437, 0.23039114, 0.38151911, 0.52897285, 0.67133229,
