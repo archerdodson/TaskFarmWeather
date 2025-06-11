@@ -1,0 +1,31 @@
+/scrtp/avon/eb/software/PyTorch/2.1.2-foss-2023a-CUDA-12.1.1/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  return self.fget.__get__(instance, owner)()
+unet
+Test SR network for WeatherBench model using SignatureKernel scoring rule
+Load weatherbench dataset...
+Loading data into RAM
+CPU memory used (MB) 8
+Loading data into RAM
+CPU memory used (MB) 2
+Loading data into RAM
+CPU memory used (MB) 2
+Loaded
+Validation set size: 354
+Test set size: 354
+find mean and std here
+test
+torch.Size([354, 200, 5, 32, 64, 1])
+torch.Size([354, 1, 2, 32, 64, 1])
+torch.Size([354, 200, 5, 32, 64])
+torch.Size([354, 2, 32, 64])
+yo
+three metrics
+(200, 354, 32, 5, 64)
+(354, 32, 2, 64)
+Traceback (most recent call last):
+  File "/gpfs/home/stats/stubxk/TaskFarmWeather/WeatherE3P5ES/Metricspy200Energy.py", line 433, in <module>
+    target_data_test_for_calibrationarea = target_data_test_for_calibration.reshape(354, 32, 64*prediction_length)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: cannot reshape array of size 1449984 into shape (354,32,320)
+srun: error: node024: task 0: Exited with exit code 1
+srun: launch/slurm: _step_signal: Terminating StepId=1491553.0
