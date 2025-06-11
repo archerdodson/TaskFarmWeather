@@ -123,7 +123,7 @@ print(string)
 print("Load weatherbench dataset...")
 dataset_train, dataset_val, dataset_test = load_weatherbench_data(weatherbench_data_folder, cuda, load_all_data_GPU,
                                                             return_test=True,
-                                                            weatherbench_small=weatherbench_small)
+                                                            weatherbench_small=weatherbench_small, predictionlength=prediction_length)
 print("Loaded")
 print("Validation set size:", len(dataset_val))
 print("Test set size:", len(dataset_test))
@@ -429,8 +429,8 @@ with torch.no_grad():
     print(predictions_for_calibration.shape)
     print(target_data_test_for_calibration.shape)
 
-    predictions_for_calibrationarea = predictions_for_calibration.reshape(prediction_ensemble_size,354,32,64*prediction_length)
-    target_data_test_for_calibrationarea = target_data_test_for_calibration.reshape(354, 32, 64*prediction_length)
+    predictions_for_calibrationarea = predictions_for_calibration.reshape(prediction_ensemble_size,351,32,64*prediction_length)
+    target_data_test_for_calibrationarea = target_data_test_for_calibration.reshape(351, 32, 64*prediction_length)
     print('area')
     print(predictions_for_calibrationarea.shape)
     print(target_data_test_for_calibrationarea.shape)
@@ -443,8 +443,8 @@ with torch.no_grad():
 
 
     print('bad')
-    predictions_for_calibration = predictions_for_calibration.reshape(prediction_ensemble_size,354,32*64*prediction_length)
-    target_data_test_for_calibration = target_data_test_for_calibration.reshape(354, 32*64*prediction_length)
+    predictions_for_calibration = predictions_for_calibration.reshape(prediction_ensemble_size,351,32*64*prediction_length)
+    target_data_test_for_calibration = target_data_test_for_calibration.reshape(351, 32*64*prediction_length)
     print(predictions_for_calibration.shape)
     print(target_data_test_for_calibration.shape)
     data_size = target_data_test_for_calibration.shape[-1]
